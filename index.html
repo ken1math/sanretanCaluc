@@ -103,6 +103,23 @@
       updateURLParams(answerInput, correctAnswerInput);
     }
 
+    // 回答
+    function submitAnswer() {
+      const answer = document.getElementById("answerInput").value.trim();
+      if (answer.length !== 3) {
+        alert("回答は3文字で入力してください。");
+        return;
+      }
+      
+      const params = new URLSearchParams({
+        card1: answer.charAt(0),
+        card2: answer.charAt(1),
+        card3: answer.charAt(2)
+      }).toString();
+      
+      window.location.href = `showAnswer.html?${params}`;
+    }
+
     // テーブルにデータを表示する関数
     function displayAnswers() {
       const data = getURLParams();
@@ -146,6 +163,8 @@
     <input type="text" id="answerInput" placeholder="回答（3文字）">
     <input type="text" id="correctAnswerInput" placeholder="正解（3文字）">
     <button onclick="addAnswer()">確定</button>
+
+    <button onclick="submitAnswer()">回答</button>
   </div>
   
   <!-- 合計得点表示 -->

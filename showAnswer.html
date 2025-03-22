@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>カードのひっくり返し</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f0f0f0;
+    }
+
+    .card-container {
+      display: flex;
+      flex-direction: column; /* 縦並び */
+      justify-content: space-around;
+      gap: 10px;
+    }
+
+    .card-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .rank {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .card {
+      width: 150px; /* 横長に変更 */
+      height: 100px; /* 高さを短く */
+      perspective: 1000px;
+      cursor: pointer;
+    }
+
+    .card-inner {
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform 0.6s;
+    }
+
+    .card-front, .card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 24px;
+      background-color: lightgray;
+      border: 1px solid #ccc;
+    }
+
+    .card-back {
+      transform: rotateY(180deg);
+      background-color: lightblue;
+    }
+
+    .card.flipped .card-inner {
+      transform: rotateY(180deg);
+    }
+
+  /* 各文字に対応するカードの色と文字の色 */
+    .card-A .card-front { background-color: #ffffff; color: #000000; } /* 白地に黒文字 */
+    .card-B .card-front { background-color: #000000; color: #ffffff; } /* 黒地に白文字 */
+    .card-C .card-front { background-color: #ff0000; color: #ffffff; } /* 赤地に白文字 */
+    .card-D .card-front { background-color: #0000ff; color: #ffffff; } /* 青地に白文字 */
+    .card-E .card-front { background-color: #ffff00; color: #000000; } /* 黄地に黒文字 */
+    .card-F .card-front { background-color: #008000; color: #ffffff; } /* 緑地に白文字 */
+    .card-G .card-front { background-color: #ff8c00; color: #ffffff; } /* 橙地に白文字 */
+  </style>
+</head>
+<body>
+  <div class="card-container">
+    <div class="card-wrapper">
+      <div class="rank">1位</div>
+      <div class="card flipped" id="card1" onclick="flipCard(this)">
+        <div class="card-inner">
+          <div class="card-front" id="card1-front">Z</div>
+          <div class="card-back"> </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-wrapper">
+      <div class="rank">2位</div>
+      <div class="card flipped" id="card2" onclick="flipCard(this)">
+        <div class="card-inner">
+          <div class="card-front" id="card2-front">Z</div>
+          <div class="card-back"> </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-wrapper">
+      <div class="rank">3位</div>
+      <div class="card flipped" id="card3" onclick="flipCard(this)">
+        <div class="card-inner">
+          <div class="card-front" id="card3-front">Z</div>
+          <div class="card-back"> </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // URLパラメータを取得する関数
+    function getQueryParam(name) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(name);
+    }
+
+    // カードに応じて色を変更する関数
+    function setCardColor(card, letter) {
+      // 色に対応するクラスを付与
+      card.classList.add(`card-${letter}`);
+    }
+
+    // URLパラメータから文字を取得し、カードの表に挿入
+    window.onload = function() {
+      const card1Text = getQueryParam('card1');  // 1位のカード用
+      const card2Text = getQueryParam('card2');  // 2位のカード用
+      const card3Text = getQueryParam('card3');  // 3位のカード用
+
+      // 1位のカード
+      if (card1Text) {
+        document.getElementById('card1-front').textContent = card1Text;
+        setCardColor(document.getElementById('card1'), card1Text);
+      }
+
+      // 2位のカード
+      if (card2Text) {
+        document.getElementById('card2-front').textContent = card2Text;
+        setCardColor(document.getElementById('card2'), card2Text);
+      }
+
+      // 3位のカード
+      if (card3Text) {
+        document.getElementById('card3-front').textContent = card3Text;
+        setCardColor(document.getElementById('card3'), card3Text);
+      }
+    }
+
+    // カードをひっくり返す関数
+    function flipCard(card) {
+      card.classList.toggle('flipped');
+    }
+  </script>
+</body>
+</html>
