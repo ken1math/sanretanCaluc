@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>回答登録＆得点表示</title>
+  <style>
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    .form-container {
+      margin-bottom: 20px;
+    }
+    input {
+      margin-right: 10px;
+    }
+  </style>
+  <script>
+    // URLパラメータから 'data' を取得し、JSONを返す関数
+    function getURLParams() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const data = urlParams.get('data');
+      if (data) {
+        try {
+          return JSON.parse(decodeURIComponent(data));
+        } catch(e) {
+          console.error("JSON parse error:", e);
+          return [];
+        }
+      }
+      return [];
+    }
+
+    // 回答と正解のペアに対して得点を計算する関数
+    function computeScore(answer, correct) {
+      if (answer.length !== 3 || correct.length !== 3) {
+        return 0;
+      }
+      
+      if (answer === correct) {
+        return 6;
+      }
+      
+      const sortedAnswer = answer.split('').sort().join('');
+      const sortedCorrect = correct.split('').sort().join('');
+      if (sortedAnswer === sortedCorrect) {
+        return 4;
+      }
+      
+      if (answer.substring(0, 2) === correct.substring(0, 2)) {
+        return 3;
+      }
+      
+      let commonCount = 0;
+      let correctLetters = correct.split('');
+      for (const char of answer) {
+        const idx = correctLetters.indexOf(char);
+        if (idx !== -1) {
+          commonCount++;
+          correctLetters.splice(idx, 1);
+        }
+      }
+      if (commonCount >= 2) {
+        return 2;
+      }
+      
+      if (answer.charAt(0) === correct.charAt(0)) {
+        return 1;
+      }
+      
+      return 0;
+    }
+
+    // URLパラメータに新しいデータを追加し、ページを再読み込みする関数
+    function updateURLParams(answer, correctAnswer) {
+      const currentData = getURLParams();
+      const newData = [{ answer, correctAnswer }, ...currentData];
+      const newDataEncoded = encodeURIComponent(JSON.stringify(newData));
+      const newURL = window.location.pathname + '?data=' + newDataEncoded;
+      window.location.href = newURL;
+    }
+
+    // 確定ボタンが押されたときの処理
+    function addAnswer() {
+      const answerInput = document.getElementById("answerInput").value.trim();
+      const correctAnswerInput = document.getElementById("correctAnswerInput").value.trim();
+      
+      if (answerInput.length !== 3 || correctAnswerInput.length !== 3) {
+        alert("回答も正解も、必ずアルファベット3文字で入力してください。");
+        return;
+      }
+      
+      updateURLParams(answerInput, correctAnswerInput);
+    }
+
+    // テーブルにデータを表示する関数
+    function displayAnswers() {
+      const data = getURLParams();
+      const tableBody = document.getElementById("answersTableBody");
+      const totalScoreElement = document.getElementById("totalScore");
+      
+      tableBody.innerHTML = "";
+      let totalScore = 0;
+
+      data.forEach((item) => {
+        const row = document.createElement("tr");
+        
+        const answerCell = document.createElement("td");
+        answerCell.textContent = item.answer;
+        row.appendChild(answerCell);
+        
+        const correctCell = document.createElement("td");
+        correctCell.textContent = item.correctAnswer;
+        row.appendChild(correctCell);
+        
+        const score = computeScore(item.answer, item.correctAnswer);
+        const scoreCell = document.createElement("td");
+        scoreCell.textContent = score;
+        row.appendChild(scoreCell);
+        
+        totalScore += score;
+        tableBody.appendChild(row);
+      });
+      
+      totalScoreElement.textContent = `合計得点: ${totalScore}`;
+    }
+    
+    window.onload = displayAnswers;
+  </script>
+</head>
+<body>
+  <h1>回答登録＆得点表示</h1>
+  
+  <!-- 回答と正解を登録するフォーム -->
+  <div class="form-container">
+    <input type="text" id="answerInput" placeholder="回答（3文字）">
+    <input type="text" id="correctAnswerInput" placeholder="正解（3文字）">
+    <button onclick="addAnswer()">確定</button>
+  </div>
+  
+  <!-- 合計得点表示 -->
+  <div id="totalScore" style="margin-top: 20px; font-weight: bold;">
+    合計得点: 0
+  </div>
+
+  <!-- 結果を表示するテーブル -->
+  <table>
+    <thead>
+      <tr>
+        <th>回答</th>
+        <th>正解</th>
+        <th>得点</th>
+      </tr>
+    </thead>
+    <tbody id="answersTableBody">
+      <!-- ここにデータが追加されます -->
+    </tbody>
+  </table>
+
+</body>
+</html>
